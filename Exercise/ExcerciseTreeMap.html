@@ -48,7 +48,9 @@
     console.log(data_formatted)
 
 
-    d3.json("../data/treeMapJson.json").then(function (Data) {
+    // I attempted two different formats for the Json. One grouped by both parent and child, and one grouped by just parent.
+    //What is the issue.
+    d3.json("../data/treeMapJson2.json").then(function (Data) {
         //we select container above
         let dom = document.getElementById("container");
 
