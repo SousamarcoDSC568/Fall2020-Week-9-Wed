@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html style="height: 100%">
+<head>
+    <title>eCharts TreeMap</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="../Example_wed 9.3/libs/echarts.min.js"></script>
+
+</head>
+
+
+
+<body style="height: 100%; margin: 0">
+<div class="title">Treemap</div>
+
+<div id="container" style="height: 100%"></div>
+
+<script type="text/javascript">
+
+    //Here is the script in which we use the data to create an echart
+
+    // data
+    let data=[
+        {"parentColumn": "",  "childColumn":"A"},
+        {"parentColumn": "A", "childColumn":"B"},
+        {"parentColumn": "A", "childColumn":"C"},
+        {"parentColumn": "B", "childColumn":"D","val":30},
+        {"parentColumn": "B", "childColumn":"E","val":50},
+        {"parentColumn": "C", "childColumn":"F","val":20},
+        {"parentColumn": "C", "childColumn":"G","val":40},
+        {"parentColumn": "C", "childColumn":"H","val":60}
+    ]
+
+    let  stratify_function= d3.stratify()
+        .id(d => d["childColumn"])
+        .parentId(d => d["parentColumn"])
+    //*****************************
+    // Step 2.2 apply stratify function on data
+    let data_formatted = stratify_function(data)
+    //*****************************
+    // Step 2.3 make hierarchy from data
+    let hier_root = d3.hierarchy(data_formatted)
+    hier_root.sum(function(d) {
+        return d.data.val;
+    })
+/**/
+    console.log(data)
+    console.log(data_formatted)
+
+
+    d3.json("../data/treeMapJson.json").then(function (Data) {
+        //we select container above
+        let dom = document.getElementById("container");
+
+        //initialize echarts object
+        let treeMap = echarts.init(dom);
+
+        console.log(Data);
+
+        treeMap.setOption({             // define type of visualization
+            series: [
+                {
+                    type: 'treemap', // visualization type
+                    data: Data,     // data
+                    label: {        // show or hide labels
+                        show: true,
+                        formatter: '{b}'
+                    },
+                }
+            ]
+        }, true)
+    })
+
+</script>
+
+
+</body>
+</html>

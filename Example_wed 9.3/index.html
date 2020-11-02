@@ -10,12 +10,18 @@
    </head>
    <body style="height: 100%; margin: 0">
        <div id="container" style="height: 100%"></div>
+
+
+
+
        <script type="text/javascript">
 
 d3.json("../data/us_population.json").then(function (Data) {
 
     let dom = document.getElementById("container"); // select container
     let treeMap = echarts.init(dom); // initiate echarts object
+
+
     treeMap.setOption({             // define type of visualization
         series: [
             {
@@ -31,5 +37,7 @@ d3.json("../data/us_population.json").then(function (Data) {
 });
 
        </script>
+
+
    </body>
 </html>
