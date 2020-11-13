@@ -31,47 +31,61 @@
         {"parentColumn": "C", "childColumn":"H","val":60}
     ]
 
-    let  stratify_function= d3.stratify()
-        .id(d => d["childColumn"])
-        .parentId(d => d["parentColumn"])
-    //*****************************
-    // Step 2.2 apply stratify function on data
-    let data_formatted = stratify_function(data)
-    //*****************************
-    // Step 2.3 make hierarchy from data
-    let hier_root = d3.hierarchy(data_formatted)
-    hier_root.sum(function(d) {
-        return d.data.val;
-    })
-/**/
+
     console.log(data)
+
+    function flat_csv_to_nested_json(database,parentColumnName,childColumnName,valueColumnsName)
+    {
+        // Step 1 stratify function converts data to parent child format
+        let stratify_function = d3.stratify()
+            .id(function (d){return d[childColumnName]})
+            .parentId(function (d){return d[parentColumnName]})
+        // Step 2 apply stratify function on data
+        let data_formatted = stratify_function(database)
+        // Step 3 make sums of valus to the hierarchy
+        let data_hierarchy = d3.hierarchy(data_formatted)
+        data_hierarchy.sum(function(d) {
+            return d.data[valueColumnsName];
+        })
+        // Step 4 Traverse the object
+        function nest_a_flat_csv(data)
+        {
+            if(!data.hasOwnProperty("children")) {
+                return {"name": data.data.id,"value":data.value}}
+            else
+            {let temp = []
+                data.children.forEach(function (d,i){temp.push(nest_a_flat_csv(data.children[i]));})
+                return{"name": data.data.id,"children": temp}
+            }
+        }
+        return [nest_a_flat_csv(data_hierarchy)]
+    }
+
+    data_formatted = flat_csv_to_nested_json(data,"parentColumn","childColumn","val")
+
     console.log(data_formatted)
 
 
-    // I attempted two different formats for the Json. One grouped by both parent and child, and one grouped by just parent.
-    //What is the issue.
-    d3.json("../data/treeMapJson2.json").then(function (Data) {
-        //we select container above
-        let dom = document.getElementById("container");
+    //we select container above
+    let dom = document.getElementById("container");
 
-        //initialize echarts object
-        let treeMap = echarts.init(dom);
+    //initialize echarts object
+    let treeMap = echarts.init(dom);
 
-        console.log(Data);
+    treeMap.setOption({             // define type of visualization
+        series: [
+            {
+                type: 'treemap', // visualization type
+                data: data_formatted,     // data
+                label: {        // show or hide labels
+                    show: true,
+                    formatter: '{b}'
+                },
+            }
+        ]
+    }, true)
 
-        treeMap.setOption({             // define type of visualization
-            series: [
-                {
-                    type: 'treemap', // visualization type
-                    data: Data,     // data
-                    label: {        // show or hide labels
-                        show: true,
-                        formatter: '{b}'
-                    },
-                }
-            ]
-        }, true)
-    })
+
 
 </script>
 
